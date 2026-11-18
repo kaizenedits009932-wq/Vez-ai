@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VEX AI Studio</title>
+<style>
+:root{--bg:#090711;--panel:#141020;--panel2:#1b1530;--purple:#8b5cf6;--pink:#c084fc;--muted:#a69bbd;--line:#302543}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% -20%,#302052 0,transparent 48%),var(--bg);color:#f7f3ff;font:15px Inter,system-ui,Arial,sans-serif;min-height:100vh}
+header{height:70px;border-bottom:1px solid #241c34;display:flex;align-items:center;justify-content:space-between;padding:0 max(20px,calc((100% - 1050px)/2));background:#0b0812d9;position:sticky;top:0;backdrop-filter:blur(14px);z-index:2}
+.brand{font-weight:900;letter-spacing:2px;font-size:19px}.brand span{color:#b58aff}.tag{color:#c4b5fd;border:1px solid #574078;border-radius:20px;padding:6px 11px;font-size:11px}
+main{max-width:850px;margin:45px auto;padding:0 18px}.intro{text-align:center;margin-bottom:30px}.intro h1{font-size:clamp(28px,6vw,43px);margin:0 0 10px;letter-spacing:-1.5px}.intro h1 em{font-style:normal;color:#b58aff}.intro p{color:var(--muted);margin:0}
+.panel{background:linear-gradient(145deg,#171225,#100d19);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:0 20px 70px #0005;margin-bottom:16px}
+.label{font-weight:700;margin-bottom:12px;display:block}.drop{border:1.5px dashed #69528b;background:#120e1d;border-radius:15px;min-height:170px;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;cursor:pointer;transition:.2s}.drop:hover,.drop.over{border-color:#b58aff;background:#1a1230}.drop strong{display:block;margin:9px 0 4px}.drop small{color:var(--muted)}input[type=file]{display:none}
+#preview{width:100%;max-height:360px;display:none;border-radius:12px;background:#000;margin-top:14px}
+textarea{width:100%;resize:vertical;min-height:115px;background:#0d0a15;border:1px solid #3b2d52;border-radius:13px;color:white;padding:15px;font:inherit;outline:none}textarea:focus{border-color:var(--purple)}
+.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}
+.hint{font-size:12px;color:var(--muted);margin-top:8px}
+button{border:0;border-radius:12px;padding:14px 18px;font-weight:800;font-size:14px;cursor:pointer;color:white;background:linear-gradient(100deg,#7541d8,#a855f7);box-shadow:0 8px 25px #713acb40}button:disabled{opacity:.45;cursor:not-allowed}
+.secondary{background:#211a30;border:1px solid #403254;box-shadow:none}
+.actions{display:flex;gap:10px;align-items:center;margin-top:16px}.actions button:first-child{flex:1}
+#status{color:#c4b5fd;font-size:13px;margin-top:14px;min-height:20px}
+#result{display:none}#result video{width:100%;border-radius:12px;background:#000;margin:8px 0 14px}
+.note{font-size:12px;color:#8f849f;line-height:1.6;text-align:center;margin:20px 8px}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid #ffffff55;border-top-color:white;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:7px}@keyframes spin{to{transform:rotate(360deg)}}
+@media(max-width:560px){main{margin:28px auto}.panel{padding:16px}.actions{flex-direction:column}.actions button{width:100%}}
+</style></head>
+<body>
+<header><div class="brand">VEX <span>AI</span> STUDIO</div><div class="tag">VIDEO EDITOR</div></header>
+<main>
+<div class="intro"><h1>Seu clip. Sua ideia. <em>Uma edição.</em></h1><p>Envie um vídeo e diga à IA como você quer que ele fique.</p></div>
+<section class="panel">
+<label class="label">01 — Seu clip</label>
+<div class="drop" id="drop"><div><div style="font-size:30px">＋</div><strong>Toque para escolher um vídeo</strong><small>MP4, MOV ou WEBM · até 300 MB</small></div></div>
+<input id="videoFile" type="file" accept="video/mp4,video/quicktime,video/webm">
+<video id="preview" controls playsinline></video>
+<div class="row" style="margin-top:16px">
+<div><label class="label" for="musicFile">Música (opcional)</label><input id="musicFile" type="file" accept="audio/*" style="display:block;width:100%;color:#b8abc9;font-size:12px"></div>
+<div><label class="label" for="format">Formato final</label><select id="format" style="width:100%;padding:12px;border-radius:10px;background:#0d0a15;color:white;border:1px solid #3b2d52"><option value="original">Manter original</option><option value="vertical">Vertical 9:16</option><option value="square">Quadrado 1:1</option><option value="wide">Paisagem 16:9</option></select></div>
+</div>
+</section>
+<section class="panel">
+<label class="label" for="prompt">02 — Descreva a edição</label>
+<textarea id="prompt" placeholder="Ex.: Faça uma edit do Neymar com música viral, cortes dinâmicos, zoom suave, efeitos de velocidade, cores cinematográficas e uma transição no ritmo da música."></textarea>
+<div class="hint">Descreva o estilo, os efeitos, as cores e o ritmo que deseja.</div>
+<div class="actions"><button id="editBtn" disabled>✦ GERAR MINHA EDIÇÃO</button><button class="secondary" id="clearBtn">Limpar</button></div>
+<div id="status" role="status"></div>
+</section>
+<section class="panel" id="result"><label class="label">03 — Resultado</label><video id="output" controls playsinline></video><a id="download" download="vex-edicao.mp4"><button style="width:100%">↓ BAIXAR VÍDEO</button></a></section>
+<p class="note">A renderização é feita no servidor com FFmpeg. A interpretação do pedido usa uma chave de API configurada pelo responsável pela instalação. Não coloque chaves secretas neste arquivo HTML.</p>
+</main>
+<script>
+const videoInput=document.querySelector('#videoFile'), musicInput=document.querySelector('#musicFile'), drop=document.querySelector('#drop'), preview=document.querySelector('#preview'), editBtn=document.querySelector('#editBtn'), statusEl=document.querySelector('#status');
+let selectedVideo=null, previewUrl=null;
+drop.onclick=()=>videoInput.click();
+drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};
+drop.ondragleave=()=>drop.classList.remove('over');
+drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files[0]){videoInput.files=e.dataTransfer.files;videoInput.dispatchEvent(new Event('change'))}};
+videoInput.onchange=()=>{selectedVideo=videoInput.files[0];if(!selectedVideo)return;if(selectedVideo.size>300*1024*1024){alert('O vídeo deve ter até 300 MB.');videoInput.value='';return}if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(selectedVideo);preview.src=previewUrl;preview.style.display='block';drop.querySelector('strong').textContent=selectedVideo.name;editBtn.disabled=false;document.querySelector('#result').style.display='none'};
+document.querySelector('#clearBtn').onclick=()=>{videoInput.value='';musicInput.value='';document.querySelector('#prompt').value='';selectedVideo=null;preview.removeAttribute('src');preview.style.display='none';drop.querySelector('strong').textContent='Toque para escolher um vídeo';editBtn.disabled=true;statusEl.textContent=''};
+editBtn.onclick=async()=>{const prompt=document.querySelector('#prompt').value.trim();if(!selectedVideo){statusEl.textContent='Escolha um vídeo primeiro.';return}if(!prompt){statusEl.textContent='Descreva como deseja editar o vídeo.';return}
+const data=new FormData();data.append('video',selectedVideo);if(musicInput.files[0])data.append('music',musicInput.files[0]);data.append('prompt',prompt);data.append('format',document.querySelector('#format').value);
+editBtn.disabled=true;editBtn.innerHTML='<span class="spinner"></span>CRIANDO EDIÇÃO...';statusEl.textContent='A IA está analisando seu pedido e renderizando o vídeo. Isso pode levar alguns minutos.';
+try{const res=await fetch('/api/edit',{method:'POST',body:data});const body=await res.json();if(!res.ok)throw new Error(body.error||'Não foi possível editar o vídeo.');const url=body.downloadUrl;const out=document.querySelector('#output');out.src=url;document.querySelector('#download').href=url;document.querySelector('#result').style.display='block';statusEl.textContent='Edição concluída.';document.querySelector('#result').scrollIntoView({behavior:'smooth'});}catch(err){statusEl.textContent='Erro: '+err.message;}finally{editBtn.disabled=false;editBtn.textContent='✦ GERAR MINHA EDIÇÃO'}};
+</script></body></html>
